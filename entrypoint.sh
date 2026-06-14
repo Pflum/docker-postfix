@@ -17,7 +17,7 @@ postfix_copy_replace_env () {
 	while IFS= read -r line; do 
 		MATCHES="$(echo "$line" | grep -oP '(=|\s)(%{ENV:\w+}|\$ENV:\w+)(\s|$)')"
 		if [[ "$?" -eq 0 ]]; then
-			while IFS= read -r MATCH; do
+			echo "$MATCHES" | while IFS= read -r MATCH; do
 				ENVNAME="$(echo "$MATCH" | cut -d':' -f2 | cut -d'}' -f1)"
 				ENVVALUE="${!ENVNAME}"
 				FIRSTCHAR="$(echo "$MATCH" | cut -c1)"
@@ -27,7 +27,7 @@ postfix_copy_replace_env () {
 				fi
 				line="$(echo "$line" | sed "s#${MATCH}#${FIRSTCHAR}${ENVVALUE}${LASTCHAR}#")"
 				logger "Found $ENVNAME in ${1}:$LINENR and replced with \"$ENVVALUE\""
-			done <<< "$MATCHES"
+			done
 		fi 
 		echo "$line" >> "$2"
 		((LINENR++))
