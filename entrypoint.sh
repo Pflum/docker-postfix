@@ -53,13 +53,13 @@ postfix_compile_maps () {
 
 if [ -d "/etc/postfix.template/" ]; then
 	echo "Copy config from /etc/postfix.template/ to /etc/postfix/"
-	find "/etc/postfix.template/" -not -type d | while read -r file; do
-		mkdir -p "$(dirname $file)"
-		cp --remove-destination "$(readlink $file)" "$file"
-		chmod 640 "$file"
+	find "/etc/postfix.template/" ! -path "*/..*" ! -type d | while read -r file; do
+		targetfile="$(echo "$file" | sed 's#^/etc/postfix.template/#/etc/postfix/#')"
+		rm -f "$targetfile"
+		install -D -m 0640 "$file" "$targetfile"
 	done
-	find "/etc/postfix.template/" -iname "*.cf" | while read -r sourcefile; do
-		targetfile=$(echo "$sourcefile" | sed 's#^/etc/postfix.template/#/etc/postfix/#')
+	find "/etc/postfix.template/" ! -path "*/..*" -iname "*.cf" ! -type d | while read -r sourcefile; do
+		targetfile="$(echo "$sourcefile" | sed 's#^/etc/postfix.template/#/etc/postfix/#')"
 		if [ ! "$(echo "$DISABLE_ENV_REPLACE" | tr '[:upper:]' '[:lower:]')" = true ]; then
 			postfix_copy_replace_env "$sourcefile" "$targetfile"
 		fi
