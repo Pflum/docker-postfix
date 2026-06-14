@@ -64,5 +64,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           build-args: ${{ matrix.build_arg }}
           tags: |
-            ${{ github.ref == 'refs/heads/master' && format('{0}/{1}:{2}', env.REGISTRY, env.IMAGE_NAME, matrix.tag_suffix) || format('{0}/${1}:{2}-{3}', env.REGISTRY, env.IMAGE_NAME, github.ref_name, matrix.tag_suffix) }}
-            ${{ github.ref == 'refs/heads/master' && format('{0}/{1}:{2}-{3}', env.REGISTRY, env.IMAGE_NAME, matrix.tag_suffix, github.sha) || format('{0}/${1}:{2}-{3}-{4}', env.REGISTRY, env.IMAGE_NAME, github.ref_name, matrix.tag_suffix, github.sha) }}
+            ${{ github.ref == 'refs/heads/master' && format('{0}/{1}:{2}', env.REGISTRY, env.IMAGE_NAME, matrix.tag_suffix) || format('{0}/{1}:{2}-{3}', env.REGISTRY, env.IMAGE_NAME, github.ref_name, matrix.tag_suffix) }}
+            ${{ github.ref == 'refs/heads/master' && format('{0}/{1}:{2}-{3}', env.REGISTRY, env.IMAGE_NAME, matrix.tag_suffix, github.sha) || format('{0}/{1}:{2}-{3}-{4}', env.REGISTRY, env.IMAGE_NAME, github.ref_name, matrix.tag_suffix, github.sha) }}
