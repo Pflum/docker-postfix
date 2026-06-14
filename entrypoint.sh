@@ -16,7 +16,7 @@ postfix_copy_replace_env () {
 	LINENR=1
 	while IFS= read -r line; do 
 		# shellcheck disable=SC2016
-		if MATCHES="$(echo "$line" | grep -oE '(=|\s)(%\{ENV:\w+\}|\$ENV:\w+)(\s|$)')"; then
+		if MATCHES="$(echo "$line" | grep -oE '(=|\s)(%\{[Ee][Nn][Vv]:\w+\}|\$[Ee][Nn][Vv]:\w+)(\s|$)')"; then
 			echo "$MATCHES" | while IFS= read -r MATCH; do
 				ENVNAME="$(echo "$MATCH" | cut -d':' -f2 | cut -d'}' -f1)"
 				# shellcheck disable=SC2086
