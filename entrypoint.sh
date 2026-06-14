@@ -16,9 +16,10 @@ postfix_copy_replace_env () {
 	LINENR=1
 	while IFS= read -r line; do 
 		# shellcheck disable=SC2016
-		if MATCHES="$(echo "$line" | grep -oE '(=|\s)(%{ENV:\w+}|\$ENV:\w+)(\s|$)')"; then
+		if MATCHES="$(echo "$line" | grep -oE '(=|\s)(%\{ENV:\w+\}|\$ENV:\w+)(\s|$)')"; then
 			echo "$MATCHES" | while IFS= read -r MATCH; do
 				ENVNAME="$(echo "$MATCH" | cut -d':' -f2 | cut -d'}' -f1)"
+				# shellcheck disable=SC2086
 				ENVVALUE="$(eval echo \"\$$ENVNAME\")"
 				FIRSTCHAR="$(echo "$MATCH" | cut -c1)"
 				LASTCHAR="$(echo "$MATCH" | rev | cut -c1)"
@@ -52,7 +53,7 @@ postfix_compile_maps () {
 
 if [ -d "/etc/postfix.template/" ]; then
 	echo "Copy config from /etc/postfix.template/ to /etc/postfix/"
-	cp -r "/etc/postfix.template/" "/etc/postfix/"
+	cp -r /etc/postfix.template/* "/etc/postfix/"
 	find "/etc/postfix.template/" -iname "*.cf" | while read -r sourcefile; do
 		targetfile=$(echo "$sourcefile" | sed 's#^/etc/postfix.template/#/etc/postfix/#')
 		if [ ! "$(echo "$DISABLE_ENV_REPLACE" | tr '[:upper:]' '[:lower:]')" = true ]; then
