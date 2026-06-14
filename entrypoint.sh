@@ -16,8 +16,9 @@ postfix_copy_replace_env () {
 	LINENR=1
 	while IFS= read -r line; do 
 		# shellcheck disable=SC2016
-		if MATCHES="$(echo "$line" | grep -oE '(=|\s)(%\{[Ee][Nn][Vv]:\w+\}|\$[Ee][Nn][Vv]:\w+)(\s|$)')"; then
-			echo "$MATCHES" | while IFS= read -r MATCH; do
+		MATCHES="$(echo "$line" | grep -oE '(=|\s)(%\{[Ee][Nn][Vv]:\w+\}|\$[Ee][Nn][Vv]:\w+)(\s|$)')"
+		if [ -n "$MATCHES" ]; then
+			while IFS= read -r MATCH; do
 				ENVNAME="$(echo "$MATCH" | cut -d':' -f2 | cut -d'}' -f1)"
 				# shellcheck disable=SC2086
 				ENVVALUE="$(eval echo \"\$$ENVNAME\")"
@@ -26,19 +27,20 @@ postfix_copy_replace_env () {
 				if [ ! "$LASTCHAR" = " " ]; then
 					LASTCHAR=""
 				fi
-				# shellcheck disable=SC2030
 				line="$(echo "$line" | sed "s#${MATCH}#${FIRSTCHAR}${ENVVALUE}${LASTCHAR}#")"
-				logger "Found $ENVNAME in ${1}:$LINENR and replced with \"$ENVVALUE\""
-			done
+				logger "Found $ENVNAME in ${1}:$LINENR and replaced with \"$ENVVALUE\""
+			done <<EOF
+$MATCHES
+EOF
 		fi 
-		# shellcheck disable=SC2031
 		echo "$line" >> "$2"
 		LINENR=$((LINENR+1))
 	done < "$1"
 }
 
 postfix_compile_maps () {
-	if MAPS=$(grep -vE "^\s*#.*$" "$1" | grep -oE "lmdb:/\S+"); then
+	MAPS=$(grep -vE "^\s*#.*$" "$1" | grep -oE "lmdb:/\S+")
+	if [ -n "$MAPS" ]; then
 		echo "$MAPS" | while IFS= read -r MAP; do
 			FILE="$(echo "$MAP" | rev | cut -d':' -f1 | rev)"
 			if [ -e "$FILE" ]; then
