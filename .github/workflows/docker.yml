@@ -56,15 +56,6 @@ jobs:
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
       - name: Build and push Docker image - ${{ matrix.variant }}
         id: build-and-push
         uses: docker/build-push-action@v7
