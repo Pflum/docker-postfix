@@ -13,6 +13,7 @@ EXPOSE 25 465 587
 VOLUME [ "/var/spool/postfix" ]
 
 COPY VERSION /
+COPY entrypoint.sh /
 
-ENTRYPOINT ["/usr/sbin/postfix", "start-fg"]
+ENTRYPOINT ["/entrypoint.sh"]
 
