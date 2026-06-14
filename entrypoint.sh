@@ -37,7 +37,7 @@ postfix_copy_replace_env () {
 postfix_compile_maps () {
 	MAPS=$(grep -vP "^\s*#.*$" "$1" | grep -oP "lmdb:/\S+")
 	if [[ "$?" -eq 0 ]]; then
-		while IFS= read -r MAP; do
+		echo "$MAPS" | while IFS= read -r MAP; do
 			FILE="$(echo "$MAP" | rev | cut -d':' -f1 | rev)"
 			if [ -e "$FILE" ]; then
 				logger "Compile postfix-map $MAP"
@@ -45,7 +45,7 @@ postfix_compile_maps () {
 			else
 			    logger "postmap $MAP, file not found!"
 			fi
-		done <<< "$MAPS"
+		done
 	fi
 }
 
