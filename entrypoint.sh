@@ -39,13 +39,17 @@ EOF
 }
 
 postfix_compile_maps () {
-	MAPS=$(grep -vE "^\s*#.*$" "$1" | grep -oE "lmdb:/\S+")
+	MAPS=$(grep -vE "^\s*#.*$" "$1")
 	if [ -n "$MAPS" ]; then
-		echo "$MAPS" | while IFS= read -r MAP; do
+		echo "$MAPS" | while IFS= read -r LINE; do
+			MAP=$(echo "$LINE" | grep -oE "lmdb:/\S+")
 			FILE="$(echo "$MAP" | rev | cut -d':' -f1 | rev)"
 			if [ -e "$FILE" ]; then
-				logger "Compile postfix-map $MAP"
-				postmap "$MAP" || logger "postmap for $MAP failed with exitcode $?" "postmap for $MAP failed"
+				POSTMAPARGS=""
+				echo "$LINE" | grep -q -e "tls_server_sni_maps" && POSTMAPARGS="${POSTMAPARGS}-F "
+
+				logger "Compile postfix-map with \"postmap ${POSTMAPARGS}${MAP}\""
+				postmap "$POSTMAPARGS" "$MAP" || logger "postmap for $MAP failed with exitcode $?" "postmap for $MAP failed"
 			else
 			    logger "postmap $MAP, file not found!"
 			fi
